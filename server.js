@@ -22,9 +22,9 @@ app.use(cors());
 app.use(express.json())
 
 //routes
-app.use('', usersRouter)
-app.use('',profileRouter)
-app.use('',postsRouter)
+app.use('/users', usersRouter) //auth
+app.use('/profile',profileRouter) //jwt token
+app.use('',postsRouter) //all others
 
 //listening port
 app.listen(3000, () => {
