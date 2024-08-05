@@ -100,9 +100,12 @@ router.delete('/post/:postId', async (req, res) => {
 //Create a new comment (tested on Postman)
 router.post('/post/:postId/comment', async (req, res) => {
     try {
+        console.log("req.body:", req.body, "req.user:", req.user)
         req.body.author = req.user
         const post = await Post.findById(req.params.postId)
+        console.log("find post:", post)
         post.comments.push(req.body)
+        console.log("comment push", post)
         const newComment = post.comments[post.comments.length - 1]
         console.log("before save", newComment)
         await post.save()
@@ -140,12 +143,13 @@ router.delete('/post/:postId/comment/:commentId', async (req, res) => {
     try {
         const post = await Post.findById(req.params.postId)
         console.log("post:", post)
-        const deletedComment = post.comments.id(req.params.commentId)
-        deletedComment.remove()
-        // post.comments.remove({_id: req.params.commentId})
+        // const deletedComment = post.comments.id(req.params.commentId)
+        // deletedComment.remove()
+        post.comments.remove({_id: req.params.commentId})
         console.log("before the save:", post)
         await post.save()
         console.log("after the save:", post)
+        return res.status(200).json({message: "OK"})
     } catch (error) {
         return res.status(500).json({error: error.message})
     }
