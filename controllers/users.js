@@ -7,6 +7,7 @@ const User = require('../models/users.js')
 
 //const SALT_LENGTH = 12
 
+//tested working on postman
 router.post('/sign-up', async (req, res) => {
     try {
         const usernameTaken = await User.findOne({username : req.body.username})
@@ -23,6 +24,7 @@ router.post('/sign-up', async (req, res) => {
     }
 })
 
+//tested working on postman
 router.post('/sign-in', async (req, res) =>{
     try {
         const user = await User.findOne({ username: req.body.username})

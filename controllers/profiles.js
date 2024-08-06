@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/users.js')
-const verifyToken = require('../middleware/verfy-token.js')
+const verifyToken = require('../middleware/verify-token.js')
 
 //tested working on postman
 router.get('/:userId', verifyToken, async (req, res) => {
