@@ -4,6 +4,7 @@ const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
 const morgan = require('morgan');
+const serverless = require('serverless-http')
 
 
 const app = express()
