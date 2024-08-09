@@ -3,6 +3,7 @@ const dotenv = require('dotenv').config()
 const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
+const morgan = require('morgan');
 
 const app = express()
 //local imports
@@ -20,6 +21,8 @@ mongoose.connection.on('connected', () => {
 //middleware
 app.use(cors());
 app.use(express.json())
+app.use(morgan('dev'));
+
 
 //routes
 app.use('/users', usersRouter) //auth

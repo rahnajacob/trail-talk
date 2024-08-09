@@ -5,20 +5,32 @@ const Post = require('../models/posts')
 
 router.use(verifyToken)
 
-//tested and works on postman
 router.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    console.log(page)
     try {
-        const posts = await Post.find({}).populate('author').sort({createdAt: 'desc'})
-        res.status(200).json(posts)
+        const totalPosts = await Post.countDocuments({});
+        const posts = await Post.find({})
+            .populate('author')
+            .sort({ createdAt: 'desc' })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.status(200).json({
+            posts,
+            totalPages: Math.ceil(totalPosts / limit),
+            currentPage: page,
+        });
     } catch (error) {
-        res.status(500).json(error)
+        res.status(500).json(error);
     }
 });
+
 
 //tested and works on postman
 router.get('/search', async (req, res) => {
     try {
-        //const search = await Post.find({city : 'Osaka'}).populate('author') - to simulate a filter of Osaka resultsS
         const search = await Post.find({}).populate('author')
         res.status(200).json(search)
     } catch (error) {
@@ -44,14 +56,6 @@ router.get('/post/:id', async (req, res) => {
         res.status(200).json(post)
     } catch (error) {
         res.status(500).json(error)
-    }
-});
-
-router.get('', async (req, res) => {
-    try {
-
-    } catch (error) {
-
     }
 });
 
@@ -96,73 +100,56 @@ router.delete('/post/:id', async (req, res) => {
         res.status(500).json(error)
     }
 });
+//!! Commented out because we have not implemented these features on the FE yet but these routes work and we plan to that in the future.
 
-//Create a new comment
-router.post('/post/:postId/comment', async (req, res) => {
-    try {
-        req.body.author = req.user_id
-        const post = await Post.findById(req.params.postId)
-        post.comments.push(req.body)        
-        await post.save()
-        const newComment = post.comments[post.comments.length - 1]
-        newComment._doc.author = req.user
-        return res.status(201).json(newComment)
-    } catch (error) {
-        return res.status(500).json({error: error.message})
-    }
-});
+// //Create a new comment
+// router.post('/post/:postId/comment', async (req, res) => {
+//     try {
+//         req.body.author = req.user_id
+//         const post = await Post.findById(req.params.postId)
+//         post.comments.push(req.body)        
+//         await post.save()
+//         const newComment = post.comments[post.comments.length - 1]
+//         newComment._doc.author = req.user
+//         return res.status(201).json(newComment)
+//     } catch (error) {
+//         return res.status(500).json({error: error.message})
+//     }
+// });
 
-//Editing a comment (errors present on postman)
-router.put('/post/:postId/comment/:commentId', async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.postId)
+// //Editing a comment (errors present on postman)
+// router.put('/post/:postId/comment/:commentId', async (req, res) => {
+//     try {
+//         const post = await Post.findById(req.params.postId)
 
-        const comment = post.comments.id(req.params.commentId)
+//         const comment = post.comments.id(req.params.commentId)
 
-        if (!comment._doc.author._id.equals(req.user._id)) {
-            throw new Error('You cannot perform this action!')
-        }
-        comment.text = req.body.text
-        await post.save()
-        comment._doc.author = req.user
-        return res.status(200).json(comment)
-    } catch (error) {
-        return res.status(500).json({error: error.message})
-    }
-});
+//         if (!comment._doc.author._id.equals(req.user._id)) {
+//             throw new Error('You cannot perform this action!')
+//         }
+//         comment.text = req.body.text
+//         await post.save()
+//         comment._doc.author = req.user
+//         return res.status(200).json(comment)
+//     } catch (error) {
+//         return res.status(500).json({error: error.message})
+//     }
+// });
 
-//Deleting a comment
-router.delete('/post/:postId/comment/:commentId', async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.postId)
-        console.log("post:", post)
-        const deletedComment = post.comments.id(req.params.commentId)
-        deletedComment.remove()
-        // post.comments.remove({_id: req.params.commentId})
-        console.log("before the save:", post)
-        await post.save()
-        console.log("after the save:", post)
-    } catch (error) {
-        return res.status(500).json({error: error.message})
-    }
-});
-
-
-router.get('', async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-});
-
-router.post('', async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-});
-
+// //Deleting a comment
+// router.delete('/post/:postId/comment/:commentId', async (req, res) => {
+//     try {
+//         const post = await Post.findById(req.params.postId)
+//         console.log("post:", post)
+//         const deletedComment = post.comments.id(req.params.commentId)
+//         deletedComment.remove()
+//         // post.comments.remove({_id: req.params.commentId})
+//         console.log("before the save:", post)
+//         await post.save()
+//         console.log("after the save:", post)
+//     } catch (error) {
+//         return res.status(500).json({error: error.message})
+//     }
+// });
 
 module.exports = router;

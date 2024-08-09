@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken')
 
 const User = require('../models/users.js')
 
-//const SALT_LENGTH = 12
-
 //tested working on postman
 router.post('/sign-up', async (req, res) => {
     try {
@@ -17,7 +15,6 @@ router.post('/sign-up', async (req, res) => {
         req.body.hashedPassword = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10))
         const user = await User.create(req.body)
         const token = jwt.sign({username: user.username, _id: user._id}, process.env.JWT_SECRET)
-        console.log(token)
         res.status(201).json({ user, token })
     } catch (error) {
         res.status(400).json({ error: error.message });

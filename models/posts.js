@@ -38,7 +38,7 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    images: [imgSchema],
+    images: [{type: String}],
     comments: [commentSchema],
     likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
   },
